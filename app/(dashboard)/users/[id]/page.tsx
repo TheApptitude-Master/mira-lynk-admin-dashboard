@@ -148,9 +148,9 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
         <Card>
           <CardHeader><CardTitle className="text-sm">Activity</CardTitle></CardHeader>
           <CardContent className="flex flex-col gap-2 text-sm">
-            <Row label="Posts" value={formatNumber(user.totalPosts)} />
-            <Row label="Followers" value={formatNumber(user.totalFollowers)} />
-            <Row label="Following" value={formatNumber(user.totalFollowing)} />
+            <Row label="Posts" value={formatNumber(user.postCount ?? 0)} />
+            <Row label="Followers" value={formatNumber(user.followerCount ?? 0)} />
+            <Row label="Following" value={formatNumber(user.followingCount ?? 0)} />
             {user.subscription && (
               <>
                 <Row label="Sub tier" value={<Badge variant="secondary" className="capitalize">{user.subscription.tier}</Badge>} />
@@ -200,41 +200,41 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
         </Card>
       )}
 
-      <div className="flex flex-wrap gap-3">
-        {/* Verify / Unverify */}
-        {isVerified ? (
-          <Button variant="outline" onClick={() => unverifyMutation.mutate()} disabled={unverifyMutation.isPending}>
-            <ShieldOff className="h-4 w-4" />
-            Remove Verification
-          </Button>
-        ) : (
-          <Button variant="outline" onClick={() => verifyMutation.mutate()} disabled={verifyMutation.isPending}>
-            <ShieldCheck className="h-4 w-4" />
-            Verify Identity
-          </Button>
-        )}
+      {!user.isDeleted && (
+        <div className="flex flex-wrap gap-3">
+          {/* Verify / Unverify */}
+          {isVerified ? (
+            <Button variant="outline" onClick={() => unverifyMutation.mutate()} disabled={unverifyMutation.isPending}>
+              <ShieldOff className="h-4 w-4" />
+              Remove Verification
+            </Button>
+          ) : (
+            <Button variant="outline" onClick={() => verifyMutation.mutate()} disabled={verifyMutation.isPending}>
+              <ShieldCheck className="h-4 w-4" />
+              Verify Identity
+            </Button>
+          )}
 
-        {/* Ban / Unban */}
-        {user.isBanned ? (
-          <Button variant="outline" onClick={() => unbanMutation.mutate()} disabled={unbanMutation.isPending}>
-            <CheckCircle className="h-4 w-4" />
-            Unban User
-          </Button>
-        ) : (
-          <Button variant="destructive" onClick={() => setBanOpen(true)}>
-            <Ban className="h-4 w-4" />
-            Ban User
-          </Button>
-        )}
+          {/* Ban / Unban */}
+          {user.isBanned ? (
+            <Button variant="outline" onClick={() => unbanMutation.mutate()} disabled={unbanMutation.isPending}>
+              <CheckCircle className="h-4 w-4" />
+              Unban User
+            </Button>
+          ) : (
+            <Button variant="destructive" onClick={() => setBanOpen(true)}>
+              <Ban className="h-4 w-4" />
+              Ban User
+            </Button>
+          )}
 
-        {/* Delete */}
-        {!user.isDeleted && (
+          {/* Delete */}
           <Button variant="outline" className="text-red-600 border-red-200 hover:bg-red-50" onClick={() => setDeleteOpen(true)}>
             <Trash2 className="h-4 w-4" />
             Delete Account
           </Button>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Ban Dialog */}
       <Dialog open={banOpen} onOpenChange={setBanOpen}>

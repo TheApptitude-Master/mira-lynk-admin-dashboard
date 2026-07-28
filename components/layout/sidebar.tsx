@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
 import {
   LayoutDashboard,
   Users,
@@ -15,6 +16,8 @@ import {
   Shield,
   BarChart2,
   Settings,
+  Sun,
+  Moon,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { auth } from '@/lib/auth';
@@ -35,6 +38,18 @@ const navItems = [
 export function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
+  const [isDark, setIsDark] = useState(true);
+
+  useEffect(() => {
+    setIsDark(document.documentElement.classList.contains('dark'));
+  }, []);
+
+  function toggleTheme() {
+    const next = !isDark;
+    setIsDark(next);
+    document.documentElement.classList.toggle('dark', next);
+    localStorage.setItem('theme', next ? 'dark' : 'light');
+  }
 
   function handleLogout() {
     auth.clear();
@@ -72,7 +87,14 @@ export function Sidebar() {
         </ul>
       </nav>
 
-      <div className="border-t border-slate-800 p-3">
+      <div className="border-t border-slate-800 p-3 flex flex-col gap-1">
+        <button
+          onClick={toggleTheme}
+          className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-slate-400 transition-colors hover:bg-slate-800 hover:text-slate-100"
+        >
+          {isDark ? <Sun className="h-4 w-4 shrink-0" /> : <Moon className="h-4 w-4 shrink-0" />}
+          {isDark ? 'Light mode' : 'Dark mode'}
+        </button>
         <button
           onClick={handleLogout}
           className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-slate-400 transition-colors hover:bg-slate-800 hover:text-slate-100"

@@ -46,9 +46,9 @@ export interface AdminUser {
 export interface AdminUserDetail extends AdminUser {
   bio?: string | null;
   phone?: string | null;
-  totalPosts: number;
-  totalFollowers: number;
-  totalFollowing: number;
+  postCount: number;
+  followerCount: number;
+  followingCount: number;
   subscription?: {
     tier: string;
     status: string;
