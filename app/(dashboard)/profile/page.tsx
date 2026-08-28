@@ -40,7 +40,7 @@ export default function ProfilePage() {
           <CardContent className="flex flex-col gap-2">
             <Row label="Display name" value={me.displayName} />
             <Row label="Email" value={me.email} />
-            <Row label="Username" value={`@${me.username}`} />
+            <Row label="Username" value={me.username ? `@${me.username}` : '—'} />
             <Row label="Role" value={<Badge variant="default">Super Admin</Badge>} />
             <Row label="Joined" value={formatDate(me.createdAt)} />
           </CardContent>

@@ -27,8 +27,9 @@ export default function SettingsPage() {
 
   const saveMutation = useMutation({
     mutationFn: (data: AdminNotificationPref) => api.patch('/admin/me/notification-preferences', data),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['admin-notif-prefs'] });
+    onSuccess: (_res, saved) => {
+      qc.setQueryData(['admin-notif-prefs'], saved);
+      reset(saved);
       toast({ title: 'Preferences saved' });
     },
     onError: (err) => toast({ title: 'Error', description: apiError(err), variant: 'destructive' }),

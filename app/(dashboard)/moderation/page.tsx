@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -19,16 +20,25 @@ import { toast } from '@/hooks/use-toast';
 import type { Report, PageResult } from '@/types/api';
 
 const actionSchema = z.object({
-  action: z.enum(['dismiss', 'remove_content', 'ban_user']),
-  note: z.string().optional(),
+  action: z.enum(['actioned', 'dismissed']),
+  notes: z.string().max(500).optional(),
 });
 type ActionForm = z.infer<typeof actionSchema>;
 
 const STATUS_COLORS: Record<string, 'warning' | 'success' | 'secondary'> = {
   pending: 'warning',
-  resolved: 'success',
+  reviewed: 'warning',
+  actioned: 'success',
   dismissed: 'secondary',
 };
+
+// Which id is set tells you what was reported; the API has no targetType field.
+function targetOf(report: Report) {
+  if (report.postId) return { type: 'post', id: report.postId };
+  if (report.commentId) return { type: 'comment', id: report.commentId };
+  if (report.messageId) return { type: 'message', id: report.messageId };
+  return null;
+}
 
 export default function ModerationPage() {
   const qc = useQueryClient();
@@ -47,7 +57,7 @@ export default function ModerationPage() {
 
   const { register, handleSubmit, reset, watch, setValue, formState: { errors, isSubmitting } } = useForm<ActionForm>({
     resolver: zodResolver(actionSchema),
-    defaultValues: { action: 'dismiss' },
+    defaultValues: { action: 'dismissed' },
   });
 
   const actionMutation = useMutation({
@@ -86,7 +96,8 @@ export default function ModerationPage() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="pending">Pending</SelectItem>
-            <SelectItem value="resolved">Resolved</SelectItem>
+            <SelectItem value="reviewed">Reviewed</SelectItem>
+            <SelectItem value="actioned">Actioned</SelectItem>
             <SelectItem value="dismissed">Dismissed</SelectItem>
           </SelectContent>
         </Select>
@@ -103,6 +114,7 @@ export default function ModerationPage() {
                 <TableRow>
                   <TableHead>Reporter</TableHead>
                   <TableHead>Target</TableHead>
+                  <TableHead>Category</TableHead>
                   <TableHead>Reason</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Date</TableHead>
@@ -112,9 +124,33 @@ export default function ModerationPage() {
               <TableBody>
                 {data?.items.map((report) => (
                   <TableRow key={report.id}>
-                    <TableCell className="text-sm">{report.reporter?.displayName ?? '—'}</TableCell>
+                    <TableCell className="text-sm">
+                      {report.reporterId ? (
+                        <Link
+                          href={`/users/${report.reporterId}`}
+                          className="font-mono text-xs text-indigo-600 hover:underline dark:text-indigo-400"
+                        >
+                          {report.reporterId.slice(0, 8)}
+                        </Link>
+                      ) : (
+                        <span className="text-slate-400">—</span>
+                      )}
+                    </TableCell>
                     <TableCell>
-                      <span className="text-xs text-slate-500 capitalize">{report.targetType}</span>
+                      {(() => {
+                        const target = targetOf(report);
+                        return target ? (
+                          <span className="text-xs text-slate-500">
+                            <span className="capitalize">{target.type}</span>{' '}
+                            <span className="font-mono">{target.id.slice(0, 8)}</span>
+                          </span>
+                        ) : (
+                          <span className="text-xs text-slate-400">—</span>
+                        );
+                      })()}
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-xs text-slate-500 capitalize">{report.category}</span>
                     </TableCell>
                     <TableCell className="max-w-[200px] truncate text-sm">{report.reason}</TableCell>
                     <TableCell>
@@ -134,7 +170,7 @@ export default function ModerationPage() {
                 ))}
                 {data?.items.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={6} className="py-8 text-center text-slate-500">
+                    <TableCell colSpan={7} className="py-8 text-center text-slate-500">
                       No reports
                     </TableCell>
                   </TableRow>
@@ -167,15 +203,14 @@ export default function ModerationPage() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="dismiss">Dismiss</SelectItem>
-                  <SelectItem value="remove_content">Remove content</SelectItem>
-                  <SelectItem value="ban_user">Ban user</SelectItem>
+                  <SelectItem value="dismissed">Dismiss</SelectItem>
+                  <SelectItem value="actioned">Uphold (action)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="note">Note (optional)</Label>
-              <Input id="note" placeholder="Internal note..." {...register('note')} />
+              <Label htmlFor="notes">Note (optional)</Label>
+              <Input id="notes" placeholder="Internal note..." {...register('notes')} />
             </div>
             {errors.action && <p className="text-xs text-red-600">{errors.action.message}</p>}
             <div className="flex justify-end gap-2">

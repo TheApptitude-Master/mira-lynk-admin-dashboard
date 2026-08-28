@@ -88,7 +88,7 @@ export default function EmergencyPage() {
                         <span className="text-xs text-slate-400">No location</span>
                       )}
                     </TableCell>
-                    <TableCell className="text-xs text-slate-500 tabular-nums">{formatDate(alert.createdAt)}</TableCell>
+                    <TableCell className="text-xs text-slate-500 tabular-nums">{formatDate(alert.triggeredAt)}</TableCell>
                     <TableCell className="text-xs text-slate-500 tabular-nums">
                       {alert.resolvedAt ? formatDate(alert.resolvedAt) : '-'}
                     </TableCell>

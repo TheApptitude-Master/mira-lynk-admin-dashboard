@@ -46,7 +46,7 @@ export default function EmergencyDetailPage({ params }: { params: Promise<{ id: 
           <CardHeader><CardTitle className="text-sm">Alert info</CardTitle></CardHeader>
           <CardContent className="flex flex-col gap-2 text-sm">
             <Row label="User" value={alert.userDisplayName ?? alert.userId} />
-            <Row label="Triggered" value={formatDate(alert.createdAt)} />
+            <Row label="Triggered" value={formatDate(alert.triggeredAt)} />
             <Row label="Resolved" value={alert.resolvedAt ? formatDate(alert.resolvedAt) : 'Still active'} />
             {alert.latitude != null && alert.longitude != null && (
               <Row

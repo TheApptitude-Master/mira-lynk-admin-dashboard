@@ -52,7 +52,7 @@ export default function SessionsPage() {
                 <TableRow>
                   <TableHead>Topic</TableHead>
                   <TableHead>Host</TableHead>
-                  <TableHead>Participants</TableHead>
+                  <TableHead>Capacity</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Scheduled</TableHead>
                   <TableHead>Started</TableHead>
@@ -64,7 +64,7 @@ export default function SessionsPage() {
                   <TableRow key={s.id}>
                     <TableCell className="font-medium text-slate-900 dark:text-slate-100">{s.title ?? s.topic}</TableCell>
                     <TableCell className="text-sm text-slate-600 dark:text-slate-400">{s.hostName ?? s.hostDisplayName ?? s.hostId}</TableCell>
-                    <TableCell className="tabular-nums text-sm">{s.participantCount ?? '—'}</TableCell>
+                    <TableCell className="tabular-nums text-sm">{s.maxParticipants ?? '—'}</TableCell>
                     <TableCell>
                       <Badge variant={STATUS_COLORS[s.status] ?? 'secondary'} className="capitalize">{s.status}</Badge>
                     </TableCell>

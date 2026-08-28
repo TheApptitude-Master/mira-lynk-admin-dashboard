@@ -83,12 +83,16 @@ export interface AdminNotificationPref {
 
 export interface Report {
   id: string;
+  reporterId?: string | null;
+  postId?: string | null;
+  commentId?: string | null;
+  messageId?: string | null;
   reason: string;
+  category: string;
   status: string;
+  reviewedBy?: string | null;
+  reviewedAt?: string | null;
   createdAt: string;
-  reporter: { id: string; displayName: string };
-  targetType: string;
-  targetId: string;
 }
 
 export interface Community {
@@ -112,7 +116,6 @@ export interface VideoSession {
   hostId: string;
   hostName?: string;
   hostDisplayName?: string;
-  participantCount?: number;
   maxParticipants?: number;
   scheduledAt?: string | null;
   startedAt?: string | null;
@@ -129,7 +132,7 @@ export interface EmergencyAlert {
   latitude?: number | null;
   longitude?: number | null;
   resolvedAt?: string | null;
-  createdAt: string;
+  triggeredAt: string;
 }
 
 export interface AdConfig {
